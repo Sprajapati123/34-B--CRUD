@@ -25,6 +25,23 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        mainBinding.buttonLogin.setOnClickListener {
+            var email : String = mainBinding.editTextEmail.text.toString()
+            var password : String = mainBinding.editTextPassword.text.toString()
+
+            auth.signInWithEmailAndPassword(email,password).
+            addOnCompleteListener {
+                if(it.isSuccessful){
+                    Toast.makeText(applicationContext,
+                        "Login success",Toast.LENGTH_LONG).show()
+                    //navigate to dashboard
+                }else{
+                    Toast.makeText(applicationContext,
+                        it.exception?.message,Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
         mainBinding.buttonRegister.setOnClickListener {
             var email : String = mainBinding.editTextEmail.text.toString()
             var password : String = mainBinding.editTextPassword.text.toString()
