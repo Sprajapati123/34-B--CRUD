@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext,
                         "Login success",Toast.LENGTH_LONG).show()
                     //navigate to dashboard
+                    var intent = Intent(this@MainActivity,
+                        DashBoardActivity::class.java)
+                    startActivity(intent)
                 }else{
                     Toast.makeText(applicationContext,
                         it.exception?.message,Toast.LENGTH_LONG).show()
