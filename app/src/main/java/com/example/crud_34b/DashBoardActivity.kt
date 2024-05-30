@@ -38,13 +38,11 @@ class DashBoardActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.d("snapshot data ",snapshot.children.toString())
                 for(eachData in snapshot.children){
-
                     var product = eachData.getValue(ProductModel::class.java)
                     if(product!=null){
                         Log.d("data from firebase",product.name)
                         Log.d("data from firebase",product.description)
                         Log.d("data from firebase",product.price.toString())
-
                     }
                 }
             }
