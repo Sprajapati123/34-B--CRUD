@@ -33,6 +33,7 @@ class AddProductActivity : AppCompatActivity() {
                 if(it.isSuccessful){
                     Toast.makeText(applicationContext,"Data added",
                         Toast.LENGTH_LONG).show()
+                    finish()
                 }else{
                     Toast.makeText(applicationContext,it.exception?.message,
                         Toast.LENGTH_LONG).show()

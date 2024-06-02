@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.crud_34b.adapter.ProductAdapter
 import com.example.crud_34b.databinding.ActivityDashBoardBinding
 import com.example.crud_34b.model.ProductModel
 import com.google.firebase.database.DataSnapshot
@@ -22,6 +24,7 @@ class DashBoardActivity : AppCompatActivity() {
 
     var ref : DatabaseReference = database.reference.child("products")
 
+    var productList = ArrayList<ProductModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,6 +39,7 @@ class DashBoardActivity : AppCompatActivity() {
 
         ref.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
+                productList.clear()
                 Log.d("snapshot data ",snapshot.children.toString())
                 for(eachData in snapshot.children){
                     var product = eachData.getValue(ProductModel::class.java)
@@ -43,8 +47,17 @@ class DashBoardActivity : AppCompatActivity() {
                         Log.d("data from firebase",product.name)
                         Log.d("data from firebase",product.description)
                         Log.d("data from firebase",product.price.toString())
+                        productList.add(product)
                     }
                 }
+                var adapter = ProductAdapter(this@DashBoardActivity,productList)
+
+                dashBoardBinding.recyclerView.layoutManager =
+                    LinearLayoutManager(this@DashBoardActivity)
+
+                dashBoardBinding.recyclerView.adapter = adapter
+
+
             }
 
             override fun onCancelled(error: DatabaseError) {
