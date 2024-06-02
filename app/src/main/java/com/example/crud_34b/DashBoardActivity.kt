@@ -3,11 +3,14 @@ package com.example.crud_34b
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.crud_34b.adapter.ProductAdapter
 import com.example.crud_34b.databinding.ActivityDashBoardBinding
 import com.example.crud_34b.model.ProductModel
@@ -25,11 +28,40 @@ class DashBoardActivity : AppCompatActivity() {
     var ref : DatabaseReference = database.reference.child("products")
 
     var productList = ArrayList<ProductModel>()
+    lateinit var productAdapter: ProductAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         dashBoardBinding = ActivityDashBoardBinding.inflate(layoutInflater)
         setContentView(dashBoardBinding.root)
+        productAdapter = ProductAdapter(this@DashBoardActivity,productList)
+
+
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+               var id = productAdapter.getProductID(viewHolder.adapterPosition)
+                ref.child(id).removeValue().addOnCompleteListener {
+                    if(it.isSuccessful){
+                        Toast.makeText(applicationContext,"Data deleted",
+                            Toast.LENGTH_LONG).show()
+
+
+                    }else{
+                        Toast.makeText(applicationContext,it.exception?.message,
+                            Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }).attachToRecyclerView(dashBoardBinding.recyclerView)
+
 
         dashBoardBinding.floatingActionButton.setOnClickListener {
             var intent = Intent(this@DashBoardActivity,
@@ -50,12 +82,11 @@ class DashBoardActivity : AppCompatActivity() {
                         productList.add(product)
                     }
                 }
-                var adapter = ProductAdapter(this@DashBoardActivity,productList)
 
                 dashBoardBinding.recyclerView.layoutManager =
                     LinearLayoutManager(this@DashBoardActivity)
 
-                dashBoardBinding.recyclerView.adapter = adapter
+                dashBoardBinding.recyclerView.adapter = productAdapter
 
 
             }

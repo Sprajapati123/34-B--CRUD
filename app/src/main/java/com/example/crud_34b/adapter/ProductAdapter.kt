@@ -44,4 +44,8 @@ class ProductAdapter(var context: Context,var data:ArrayList<ProductModel>) :
             context.startActivity(intent)
         }
     }
+
+    fun getProductID(position: Int) : String{
+        return data[position].id
+    }
 }
