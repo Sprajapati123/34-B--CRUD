@@ -5,11 +5,17 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.crud_34b.R
 import com.example.crud_34b.UpdateProductActivity
 import com.example.crud_34b.model.ProductModel
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
+import java.lang.Exception
 
 class ProductAdapter(var context: Context,var data:ArrayList<ProductModel>) :
     RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
@@ -19,6 +25,8 @@ class ProductAdapter(var context: Context,var data:ArrayList<ProductModel>) :
         var productPrice : TextView = view.findViewById(R.id.lblPrice)
         var productDesc : TextView = view.findViewById(R.id.lblDescription)
         var btnEdit : TextView = view.findViewById(R.id.btnEdit)
+        var progressBar : ProgressBar = view.findViewById(R.id.progressBar)
+        var imgView : ImageView = view.findViewById(R.id.imageViewDisplay)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -37,6 +45,18 @@ class ProductAdapter(var context: Context,var data:ArrayList<ProductModel>) :
         holder.productName.text = data[position].name
         holder.productPrice.text = data[position].price.toString()
         holder.productDesc.text = data[position].description
+
+        var image = data[position].url
+
+        Picasso.get().load(image).into(holder.imgView,object : Callback{
+            override fun onSuccess() {
+               holder.progressBar.visibility = View.INVISIBLE
+            }
+
+            override fun onError(e: Exception?) {
+                Toast.makeText(context,e?.localizedMessage,Toast.LENGTH_LONG).show()
+            }
+        })
 
         holder.btnEdit.setOnClickListener {
             var intent = Intent(context,UpdateProductActivity::class.java)

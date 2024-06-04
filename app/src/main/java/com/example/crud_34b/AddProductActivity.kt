@@ -3,6 +3,7 @@ package com.example.crud_34b
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -10,16 +11,26 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.crud_34b.databinding.ActivityAddProductBinding
 import com.example.crud_34b.model.ProductModel
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
+import java.util.UUID
 
 class AddProductActivity : AppCompatActivity() {
+
     var firebaseDatabase : FirebaseDatabase = FirebaseDatabase.getInstance()
     var ref = firebaseDatabase.reference.child("products")
+
+    var firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
+    var storageRef : StorageReference = firebaseStorage.reference
+
     lateinit var addProductBinding: ActivityAddProductBinding
 
     lateinit var activityResultLauncher : ActivityResultLauncher<Intent>
@@ -47,24 +58,29 @@ class AddProductActivity : AppCompatActivity() {
         setContentView(addProductBinding.root)
 
         registerActivityForResult()
+
+        addProductBinding.imageBrowse.setOnClickListener{
+            var permissions = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                android.Manifest.permission.READ_MEDIA_IMAGES
+            }else{
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            }
+            if (ContextCompat.checkSelfPermission(this,permissions) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, arrayOf(permissions),1)
+            }else{
+                val intent = Intent()
+                intent.type = "image/*"
+                intent.action = Intent.ACTION_GET_CONTENT
+                activityResultLauncher.launch(intent)
+            }
+        }
         addProductBinding.btnPost.setOnClickListener {
-            var name : String = addProductBinding.editTextProductName.text.toString()
-            var price : Int = addProductBinding.editTextProductPrice.text.toString().toInt()
-            var desc : String = addProductBinding.editTextProductDesc.text.toString()
-
-            var id = ref.push().key.toString()
-
-            var data = ProductModel(id,name,price,desc)
-
-            ref.child(id).setValue(data).addOnCompleteListener {
-                if(it.isSuccessful){
-                    Toast.makeText(applicationContext,"Data added",
-                        Toast.LENGTH_LONG).show()
-                    finish()
-                }else{
-                    Toast.makeText(applicationContext,it.exception?.message,
-                        Toast.LENGTH_LONG).show()
-                }
+            if(imageUri != null){
+                uploadImage()
+            }else{
+                Toast.makeText(applicationContext,"Please upload image first",
+                    Toast.LENGTH_LONG
+                    ).show()
             }
 
         }
@@ -76,6 +92,46 @@ class AddProductActivity : AppCompatActivity() {
         }
     }
 
+    fun uploadImage(){
+        val imageName = UUID.randomUUID().toString()
+        //ram
+        var imageReference = storageRef.child("products").child(imageName)
+
+
+        imageUri?.let { url->
+           imageReference.putFile(url).addOnSuccessListener {
+              imageReference.downloadUrl.addOnSuccessListener {downloadUrl->
+                  var imagesUrl = downloadUrl.toString()
+                  addProduct(imagesUrl)
+              }
+           }.addOnFailureListener {
+               Toast.makeText(applicationContext,it.localizedMessage,
+                   Toast.LENGTH_LONG).show()
+           }
+        }
+
+
+    }
+    fun addProduct(url: String){
+        var name : String = addProductBinding.editTextProductName.text.toString()
+        var price : Int = addProductBinding.editTextProductPrice.text.toString().toInt()
+        var desc : String = addProductBinding.editTextProductDesc.text.toString()
+
+        var id = ref.push().key.toString()
+
+        var data = ProductModel(id,name,price,desc,url)
+
+        ref.child(id).setValue(data).addOnCompleteListener {
+            if(it.isSuccessful){
+                Toast.makeText(applicationContext,"Data added",
+                    Toast.LENGTH_LONG).show()
+                finish()
+            }else{
+                Toast.makeText(applicationContext,it.exception?.message,
+                    Toast.LENGTH_LONG).show()
+            }
+        }
+    }
     fun registerActivityForResult(){
         activityResultLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
