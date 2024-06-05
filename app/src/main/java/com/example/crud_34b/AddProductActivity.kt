@@ -35,6 +35,7 @@ class AddProductActivity : AppCompatActivity() {
 
     lateinit var activityResultLauncher : ActivityResultLauncher<Intent>
     var imageUri : Uri? = null
+//    var imageUri : Uri? = null
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
