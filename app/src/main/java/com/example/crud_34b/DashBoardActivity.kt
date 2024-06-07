@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
 class DashBoardActivity : AppCompatActivity() {
     lateinit var dashBoardBinding: ActivityDashBoardBinding
@@ -27,8 +29,12 @@ class DashBoardActivity : AppCompatActivity() {
 
     var ref : DatabaseReference = database.reference.child("products")
 
+    var firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
+    var storageRef : StorageReference = firebaseStorage.reference
+
     var productList = ArrayList<ProductModel>()
     lateinit var productAdapter: ProductAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -48,8 +54,11 @@ class DashBoardActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                var id = productAdapter.getProductID(viewHolder.adapterPosition)
+               var imageName = productAdapter.getImageName(viewHolder.adapterPosition)
+
                 ref.child(id).removeValue().addOnCompleteListener {
                     if(it.isSuccessful){
+                        storageRef.child("products").child(imageName).delete()
                         Toast.makeText(applicationContext,"Data deleted",
                             Toast.LENGTH_LONG).show()
 
