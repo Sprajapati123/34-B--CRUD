@@ -35,7 +35,6 @@ class AddProductActivity : AppCompatActivity() {
 
     lateinit var activityResultLauncher : ActivityResultLauncher<Intent>
     var imageUri : Uri? = null
-//    var imageUri : Uri? = null
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -95,15 +94,14 @@ class AddProductActivity : AppCompatActivity() {
 
     fun uploadImage(){
         val imageName = UUID.randomUUID().toString()
-        //ram
-        var imageReference = storageRef.child("products").child(imageName)
 
+        var imageReference = storageRef.child("products").child(imageName)
 
         imageUri?.let { url->
            imageReference.putFile(url).addOnSuccessListener {
               imageReference.downloadUrl.addOnSuccessListener {downloadUrl->
                   var imagesUrl = downloadUrl.toString()
-                  addProduct(imagesUrl)
+                  addProduct(imagesUrl,imageName)
               }
            }.addOnFailureListener {
                Toast.makeText(applicationContext,it.localizedMessage,
@@ -113,14 +111,14 @@ class AddProductActivity : AppCompatActivity() {
 
 
     }
-    fun addProduct(url: String){
+    fun addProduct(url: String,imageName: String){
         var name : String = addProductBinding.editTextProductName.text.toString()
         var price : Int = addProductBinding.editTextProductPrice.text.toString().toInt()
         var desc : String = addProductBinding.editTextProductDesc.text.toString()
 
         var id = ref.push().key.toString()
 
-        var data = ProductModel(id,name,price,desc,url)
+        var data = ProductModel(id,name,price,desc,url,imageName)
 
         ref.child(id).setValue(data).addOnCompleteListener {
             if(it.isSuccessful){
