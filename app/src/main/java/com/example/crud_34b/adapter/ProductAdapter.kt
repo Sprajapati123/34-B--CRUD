@@ -11,7 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.crud_34b.R
-import com.example.crud_34b.UpdateProductActivity
+import com.example.crud_34b.ui.activity.UpdateProductActivity
 import com.example.crud_34b.model.ProductModel
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -59,7 +59,7 @@ class ProductAdapter(var context: Context,var data:ArrayList<ProductModel>) :
         })
 
         holder.btnEdit.setOnClickListener {
-            var intent = Intent(context,UpdateProductActivity::class.java)
+            var intent = Intent(context, UpdateProductActivity::class.java)
             intent.putExtra("product",data[position])
             context.startActivity(intent)
         }

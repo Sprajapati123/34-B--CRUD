@@ -1,4 +1,4 @@
-package com.example.crud_34b
+package com.example.crud_34b.ui.activity
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,13 +15,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.crud_34b.R
 import com.example.crud_34b.databinding.ActivityUpdateProductBinding
 import com.example.crud_34b.model.ProductModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
-import java.util.UUID
 
 class UpdateProductActivity : AppCompatActivity() {
     lateinit var updateProductBinding: ActivityUpdateProductBinding

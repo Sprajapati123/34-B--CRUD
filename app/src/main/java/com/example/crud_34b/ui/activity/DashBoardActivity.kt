@@ -1,4 +1,4 @@
-package com.example.crud_34b
+package com.example.crud_34b.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.crud_34b.R
 import com.example.crud_34b.adapter.ProductAdapter
 import com.example.crud_34b.databinding.ActivityDashBoardBinding
 import com.example.crud_34b.model.ProductModel
@@ -41,7 +42,6 @@ class DashBoardActivity : AppCompatActivity() {
         dashBoardBinding = ActivityDashBoardBinding.inflate(layoutInflater)
         setContentView(dashBoardBinding.root)
         productAdapter = ProductAdapter(this@DashBoardActivity,productList)
-
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
             override fun onMove(

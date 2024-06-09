@@ -1,4 +1,4 @@
-package com.example.crud_34b
+package com.example.crud_34b.ui.activity
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.crud_34b.R
 import com.example.crud_34b.databinding.ActivityAddProductBinding
 import com.example.crud_34b.model.ProductModel
 import com.google.firebase.database.FirebaseDatabase
@@ -94,9 +95,7 @@ class AddProductActivity : AppCompatActivity() {
 
     fun uploadImage(){
         val imageName = UUID.randomUUID().toString()
-
         var imageReference = storageRef.child("products").child(imageName)
-
         imageUri?.let { url->
            imageReference.putFile(url).addOnSuccessListener {
               imageReference.downloadUrl.addOnSuccessListener {downloadUrl->
