@@ -18,6 +18,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.crud_34b.R
 import com.example.crud_34b.databinding.ActivityAddProductBinding
 import com.example.crud_34b.model.ProductModel
+import com.example.crud_34b.utils.ImageUtils
+import com.example.crud_34b.viewmodel.ProductViewModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -26,16 +28,14 @@ import java.util.UUID
 
 class AddProductActivity : AppCompatActivity() {
 
-    var firebaseDatabase : FirebaseDatabase = FirebaseDatabase.getInstance()
-    var ref = firebaseDatabase.reference.child("products")
-
-    var firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
-    var storageRef : StorageReference = firebaseStorage.reference
 
     lateinit var addProductBinding: ActivityAddProductBinding
 
     lateinit var activityResultLauncher : ActivityResultLauncher<Intent>
     var imageUri : Uri? = null
+
+    lateinit var imageUtils: ImageUtils
+    lateinit var productViewModel: ProductViewModel
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -130,20 +130,5 @@ class AddProductActivity : AppCompatActivity() {
             }
         }
     }
-    fun registerActivityForResult(){
-        activityResultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-            ActivityResultCallback {result ->
 
-                val resultcode = result.resultCode
-                val imageData = result.data
-                if(resultcode == RESULT_OK && imageData != null){
-                    imageUri = imageData.data
-                    imageUri?.let {
-                        Picasso.get().load(it).into(addProductBinding.imageBrowse)
-                    }
-                }
-
-            })
-    }
 }
