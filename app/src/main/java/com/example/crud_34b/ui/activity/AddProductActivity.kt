@@ -58,22 +58,17 @@ class AddProductActivity : AppCompatActivity() {
         addProductBinding = ActivityAddProductBinding.inflate(layoutInflater)
         setContentView(addProductBinding.root)
 
-        registerActivityForResult()
+        imageUtils = ImageUtils(this)
+        imageUtils.registerActivity { url->
+            url.let {
+                imageUri = it
+                Picasso.get().load(it).into(addProductBinding.imageBrowse)
+            }
+
+        }
 
         addProductBinding.imageBrowse.setOnClickListener{
-            var permissions = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                android.Manifest.permission.READ_MEDIA_IMAGES
-            }else{
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-            if (ContextCompat.checkSelfPermission(this,permissions) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this, arrayOf(permissions),1)
-            }else{
-                val intent = Intent()
-                intent.type = "image/*"
-                intent.action = Intent.ACTION_GET_CONTENT
-                activityResultLauncher.launch(intent)
-            }
+          imageUtils.launchGallery(this)
         }
         addProductBinding.btnPost.setOnClickListener {
             if(imageUri != null){
@@ -94,41 +89,32 @@ class AddProductActivity : AppCompatActivity() {
     }
 
     fun uploadImage(){
-        val imageName = UUID.randomUUID().toString()
-        var imageReference = storageRef.child("products").child(imageName)
-        imageUri?.let { url->
-           imageReference.putFile(url).addOnSuccessListener {
-              imageReference.downloadUrl.addOnSuccessListener {downloadUrl->
-                  var imagesUrl = downloadUrl.toString()
-                  addProduct(imagesUrl,imageName)
-              }
-           }.addOnFailureListener {
-               Toast.makeText(applicationContext,it.localizedMessage,
-                   Toast.LENGTH_LONG).show()
-           }
+        imageUri?.let {
+            productViewModel.uploadImage(it){
+                success, imageUrl, imageName ->
+                if(success){
+                    addProduct(imageUrl.toString(),imageName.toString())
+                }
+            }
         }
-
-
     }
     fun addProduct(url: String,imageName: String){
         var name : String = addProductBinding.editTextProductName.text.toString()
         var price : Int = addProductBinding.editTextProductPrice.text.toString().toInt()
         var desc : String = addProductBinding.editTextProductDesc.text.toString()
 
-        var id = ref.push().key.toString()
-
-        var data = ProductModel(id,name,price,desc,url,imageName)
-
-        ref.child(id).setValue(data).addOnCompleteListener {
-            if(it.isSuccessful){
-                Toast.makeText(applicationContext,"Data added",
-                    Toast.LENGTH_LONG).show()
-                finish()
+        var data = ProductModel("",name,price,desc,url,imageName)
+        productViewModel.addProduct(data){
+            success,messsage ->
+            if(success){
+              Toast.makeText(applicationContext,messsage,
+                  Toast.LENGTH_LONG).show()
             }else{
-                Toast.makeText(applicationContext,it.exception?.message,
-                    Toast.LENGTH_LONG).show()
+              Toast.makeText(applicationContext,messsage,
+                  Toast.LENGTH_LONG).show()
             }
         }
+
     }
 
 }
