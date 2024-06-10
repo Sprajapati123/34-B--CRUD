@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.crud_34b.R
 import com.example.crud_34b.databinding.ActivityAddProductBinding
 import com.example.crud_34b.model.ProductModel
+import com.example.crud_34b.repository.ProductRepositoryImpl
 import com.example.crud_34b.utils.ImageUtils
 import com.example.crud_34b.viewmodel.ProductViewModel
 import com.google.firebase.database.FirebaseDatabase
@@ -64,8 +65,10 @@ class AddProductActivity : AppCompatActivity() {
                 imageUri = it
                 Picasso.get().load(it).into(addProductBinding.imageBrowse)
             }
-
         }
+
+        var repo = ProductRepositoryImpl()
+        productViewModel = ProductViewModel(repo)
 
         addProductBinding.imageBrowse.setOnClickListener{
           imageUtils.launchGallery(this)
