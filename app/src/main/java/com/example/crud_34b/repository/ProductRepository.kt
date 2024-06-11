@@ -7,5 +7,4 @@ interface ProductRepository {
     fun uploadImage(imageUrl : Uri,callback: (Boolean, String?,String?) -> Unit)
     fun addProduct(productModel: ProductModel,callback :(Boolean,String?) -> Unit)
 
-
 }
