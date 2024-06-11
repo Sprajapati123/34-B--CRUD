@@ -112,6 +112,7 @@ class AddProductActivity : AppCompatActivity() {
             if(success){
               Toast.makeText(applicationContext,messsage,
                   Toast.LENGTH_LONG).show()
+                finish()
             }else{
               Toast.makeText(applicationContext,messsage,
                   Toast.LENGTH_LONG).show()
