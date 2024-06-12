@@ -7,11 +7,17 @@ import com.example.crud_34b.model.ProductModel
 import com.example.crud_34b.repository.ProductRepository
 
 class ProductViewModel(val repository: ProductRepository) : ViewModel() {
-    fun uploadImage(imageUrl: Uri, callback: (Boolean, String?, String?) -> Unit) {
-        repository.uploadImage(imageUrl) { success, imageUrl, imageName ->
-            callback(success, imageUrl, imageName)
+
+    fun updateProduct(id:String,data:MutableMap<String,Any>?,callback: (Boolean, String?) -> Unit){
+        repository.updateProduct(id,data,callback)
+    }
+
+    fun uploadImage(imageName: String,imageUrl: Uri, callback: (Boolean, String?) -> Unit) {
+        repository.uploadImage(imageName,imageUrl) { success, imageUrl ->
+            callback(success, imageUrl)
         }
     }
+
 
     fun addProduct(productModel: ProductModel, callback: (Boolean, String?) -> Unit) {
         repository.addProduct(productModel, callback)

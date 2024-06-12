@@ -18,6 +18,9 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.crud_34b.R
 import com.example.crud_34b.databinding.ActivityUpdateProductBinding
 import com.example.crud_34b.model.ProductModel
+import com.example.crud_34b.repository.ProductRepositoryImpl
+import com.example.crud_34b.utils.ImageUtils
+import com.example.crud_34b.viewmodel.ProductViewModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -25,14 +28,13 @@ import com.squareup.picasso.Picasso
 
 class UpdateProductActivity : AppCompatActivity() {
     lateinit var updateProductBinding: ActivityUpdateProductBinding
-    var firebaseDatabase : FirebaseDatabase = FirebaseDatabase.getInstance()
-    var ref = firebaseDatabase.reference.child("products")
+
     var id = ""
     var imageName = ""
     lateinit var activityResultLauncher : ActivityResultLauncher<Intent>
     var imageUri : Uri? = null
-    var firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
-    var storageRef : StorageReference = firebaseStorage.reference
+
+    lateinit var productViewModel: ProductViewModel
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -49,12 +51,22 @@ class UpdateProductActivity : AppCompatActivity() {
         }
     }
 
+    lateinit var imageUtils: ImageUtils
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         updateProductBinding = ActivityUpdateProductBinding.inflate(layoutInflater)
         setContentView(updateProductBinding.root)
-        registerActivityForResult()
+
+        var repo = ProductRepositoryImpl()
+        productViewModel = ProductViewModel(repo)
+
+
+        imageUtils = ImageUtils(this)
+        imageUtils.registerActivity {
+            imageUri = it
+            Picasso.get().load(it).into(updateProductBinding.imageUpdate)
+        }
 
         var product: ProductModel? = intent.getParcelableExtra("product")
         id = product?.id.toString()
@@ -71,19 +83,7 @@ class UpdateProductActivity : AppCompatActivity() {
         }
 
         updateProductBinding.imageUpdate.setOnClickListener{
-            var permissions = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                android.Manifest.permission.READ_MEDIA_IMAGES
-            }else{
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-            if (ContextCompat.checkSelfPermission(this,permissions) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this, arrayOf(permissions),1)
-            }else{
-                val intent = Intent()
-                intent.type = "image/*"
-                intent.action = Intent.ACTION_GET_CONTENT
-                activityResultLauncher.launch(intent)
-            }
+            imageUtils.launchGallery(this@UpdateProductActivity)
         }
 
 
@@ -94,40 +94,17 @@ class UpdateProductActivity : AppCompatActivity() {
         }
     }
 
-    fun registerActivityForResult(){
-        activityResultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-            ActivityResultCallback {result ->
 
-                val resultcode = result.resultCode
-                val imageData = result.data
-                if(resultcode == RESULT_OK && imageData != null){
-                    imageUri = imageData.data
-                    imageUri?.let {
-                        Picasso.get().load(it).into(updateProductBinding.imageUpdate)
-                    }
-                }
-
-            })
-    }
 
     fun uploadImage(){
-
-        var imageReference = storageRef.child("products").child(imageName)
-
-        imageUri?.let { url->
-            imageReference.putFile(url).addOnSuccessListener {
-                imageReference.downloadUrl.addOnSuccessListener {downloadUrl->
-                    var imagesUrl = downloadUrl.toString()
-                    updateProduct(imagesUrl)
+        imageUri?.let {
+            productViewModel.uploadImage(imageName, it){
+                success, imageUrl ->
+                if(success){
+                    updateProduct(imageUrl.toString())
                 }
-            }.addOnFailureListener {
-                Toast.makeText(applicationContext,it.localizedMessage,
-                    Toast.LENGTH_LONG).show()
             }
         }
-
-
     }
     fun updateProduct(url: String){
         var updatedName : String = updateProductBinding.editTextProductNameUpdate.text.toString()
@@ -140,15 +117,16 @@ class UpdateProductActivity : AppCompatActivity() {
         data["description"] = updatedDesc
         data["url"] = url
 
-        ref.child(id).updateChildren(data).addOnCompleteListener {
-            if(it.isSuccessful){
-                Toast.makeText(applicationContext,"Data updated",
-                    Toast.LENGTH_LONG).show()
-                finish()
-            }else{
-                Toast.makeText(applicationContext,it.exception?.message,
-                    Toast.LENGTH_LONG).show()
-            }
-        }
+       productViewModel.updateProduct(id,data){
+           success,message->
+               if(success){
+                   Toast.makeText(applicationContext,message,
+                       Toast.LENGTH_LONG).show()
+               }else{
+                   Toast.makeText(applicationContext,message,
+                       Toast.LENGTH_LONG).show()
+               }
+
+       }
     }
 }

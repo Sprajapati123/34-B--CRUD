@@ -21,17 +21,17 @@ class ProductRepositoryImpl : ProductRepository {
     var storageRef : StorageReference = firebaseStorage.reference.child("products")
 
 
-    override fun uploadImage(imageUrl: Uri, callback: (Boolean, String?, String?) -> Unit) {
-        val imageName = UUID.randomUUID().toString()
+    override fun uploadImage(imageName: String,imageUrl: Uri, callback: (Boolean, String?) -> Unit) {
+//        val imageName = UUID.randomUUID().toString()
         var imageReference = storageRef.child(imageName)
         imageUrl?.let { url->
             imageReference.putFile(url).addOnSuccessListener {
                 imageReference.downloadUrl.addOnSuccessListener {downloadUrl->
                     var imagesUrl = downloadUrl.toString()
-                    callback(true,imagesUrl,imageName)
+                    callback(true,imagesUrl)
                 }
             }.addOnFailureListener {
-                callback(false,"","")
+                callback(false,"")
             }
         }
 
@@ -71,8 +71,17 @@ class ProductRepositoryImpl : ProductRepository {
         })
     }
 
-    override fun updateProduct(id: String, callback: (Boolean, String?) -> Unit) {
-        TODO("Not yet implemented")
+    override fun updateProduct(id: String,data: MutableMap<String,Any>?, callback: (Boolean, String?) -> Unit) {
+
+        data?.let {
+            ref.child(id).updateChildren(it).addOnCompleteListener {
+                if(it.isSuccessful){
+                    callback(true,"Your data has been updated")
+                }else{
+                   callback(false,"Unable to update data")
+                }
+            }
+        }
     }
 
     override fun deleteData(id: String, callback: (Boolean, String?) -> Unit) {
