@@ -40,6 +40,7 @@ class ProductViewModel(val repository: ProductRepository) : ViewModel() {
 
 
 
+
     fun fetchProduct(){
         _loadingState.value = true
         repository.getAllProduct { productList, success, message ->
