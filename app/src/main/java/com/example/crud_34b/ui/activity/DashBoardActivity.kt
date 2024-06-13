@@ -80,6 +80,17 @@ class DashBoardActivity : AppCompatActivity() {
                var id = productAdapter.getProductID(viewHolder.adapterPosition)
                var imageName = productAdapter.getImageName(viewHolder.adapterPosition)
 
+                productViewModel.deleteData(id){
+                    success,message->
+                    if(success){
+                        Toast.makeText(applicationContext,message,Toast.LENGTH_LONG).show()
+                        productViewModel.deleteImage(imageName){
+                                success,message->
+                        }
+                    }else{
+                        Toast.makeText(applicationContext,message,Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }).attachToRecyclerView(dashBoardBinding.recyclerView)
 
