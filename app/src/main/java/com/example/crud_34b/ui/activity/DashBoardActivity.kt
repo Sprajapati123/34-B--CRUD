@@ -68,33 +68,20 @@ class DashBoardActivity : AppCompatActivity() {
             }
         }
 
-//        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
-//            override fun onMove(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder,
-//                target: RecyclerView.ViewHolder
-//            ): Boolean {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-//               var id = productAdapter.getProductID(viewHolder.adapterPosition)
-//               var imageName = productAdapter.getImageName(viewHolder.adapterPosition)
-//
-//                ref.child(id).removeValue().addOnCompleteListener {
-//                    if(it.isSuccessful){
-//                        storageRef.child("products").child(imageName).delete()
-//                        Toast.makeText(applicationContext,"Data deleted",
-//                            Toast.LENGTH_LONG).show()
-//
-//
-//                    }else{
-//                        Toast.makeText(applicationContext,it.exception?.message,
-//                            Toast.LENGTH_LONG).show()
-//                    }
-//                }
-//            }
-//        }).attachToRecyclerView(dashBoardBinding.recyclerView)
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                TODO("Not yet implemented")
+            }
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+               var id = productAdapter.getProductID(viewHolder.adapterPosition)
+               var imageName = productAdapter.getImageName(viewHolder.adapterPosition)
+
+            }
+        }).attachToRecyclerView(dashBoardBinding.recyclerView)
 
 
         dashBoardBinding.floatingActionButton.setOnClickListener {

@@ -8,6 +8,12 @@ import com.example.crud_34b.repository.ProductRepository
 
 class ProductViewModel(val repository: ProductRepository) : ViewModel() {
 
+    fun deleteData(id:String,callback: (Boolean, String?) -> Unit){
+
+    }
+    fun deleteImage(imageName:String,callback: (Boolean, String?) -> Unit){
+
+    }
     fun updateProduct(id:String,data:MutableMap<String,Any>?,callback: (Boolean, String?) -> Unit){
         repository.updateProduct(id,data,callback)
     }
