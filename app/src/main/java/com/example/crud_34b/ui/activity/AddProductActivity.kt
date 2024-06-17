@@ -3,16 +3,11 @@ package com.example.crud_34b.ui.activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.crud_34b.R
@@ -20,14 +15,14 @@ import com.example.crud_34b.databinding.ActivityAddProductBinding
 import com.example.crud_34b.model.ProductModel
 import com.example.crud_34b.repository.ProductRepositoryImpl
 import com.example.crud_34b.utils.ImageUtils
+import com.example.crud_34b.utils.LoadingUtils
 import com.example.crud_34b.viewmodel.ProductViewModel
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import java.util.UUID
 
 class AddProductActivity : AppCompatActivity() {
+
+    lateinit var loadingUtils: LoadingUtils
 
 
     lateinit var addProductBinding: ActivityAddProductBinding
@@ -59,6 +54,8 @@ class AddProductActivity : AppCompatActivity() {
         addProductBinding = ActivityAddProductBinding.inflate(layoutInflater)
         setContentView(addProductBinding.root)
 
+        loadingUtils = LoadingUtils(this)
+
         imageUtils = ImageUtils(this)
         imageUtils.registerActivity { url->
             url.let {
@@ -84,7 +81,7 @@ class AddProductActivity : AppCompatActivity() {
 
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.btnSensorList)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -92,6 +89,7 @@ class AddProductActivity : AppCompatActivity() {
     }
 
     fun uploadImage(){
+        loadingUtils.showLoading()
         val imageName = UUID.randomUUID().toString()
         imageUri?.let {
             productViewModel.uploadImage(imageName,it){
@@ -111,10 +109,12 @@ class AddProductActivity : AppCompatActivity() {
         productViewModel.addProduct(data){
             success,messsage ->
             if(success){
+                loadingUtils.dismiss()
               Toast.makeText(applicationContext,messsage,
                   Toast.LENGTH_LONG).show()
                 finish()
             }else{
+                loadingUtils.dismiss()
               Toast.makeText(applicationContext,messsage,
                   Toast.LENGTH_LONG).show()
             }
