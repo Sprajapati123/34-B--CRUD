@@ -22,6 +22,12 @@ class SensorDashBoardActivity : AppCompatActivity() {
                 SensorListActivity::class.java)
             startActivity(intent)
         }
+
+        sensorDashBoardBinding.btnAccelerometer.setOnClickListener{
+            var intent = Intent(this@SensorDashBoardActivity,
+                AccelerometerActivity::class.java)
+            startActivity(intent)
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.btnSensorList)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
