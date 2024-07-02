@@ -2,8 +2,8 @@ package com.example.crud_34b.repository
 
 import com.google.firebase.auth.FirebaseAuth
 
-class AuthRepoImpl : AuthRepo{
-    var auth: FirebaseAuth = FirebaseAuth.getInstance()
+class AuthRepoImpl(var auth: FirebaseAuth) : AuthRepo{
+//    var auth: FirebaseAuth = FirebaseAuth.getInstance()
     override fun login(username: String, password: String, callback: (Boolean, String) -> Unit) {
         auth.signInWithEmailAndPassword(username, password).addOnCompleteListener {
             if (it.isSuccessful) {
